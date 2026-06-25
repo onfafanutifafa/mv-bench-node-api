@@ -30,7 +30,7 @@ router.get("/fetch/cdn", requireUser, async (req, res) => {
 });
 
 router.get("/go", (req, res) => {
-  res.redirect(net.buildRedirectTarget(req.query.next));
+  res.redirect(net.buildRedirectTargetSafe(req.query.next));
 });
 
 router.get("/go/safe", (req, res) => {
