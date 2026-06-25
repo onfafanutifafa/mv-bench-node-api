@@ -14,9 +14,30 @@ function hashPassword(password) {
 /** Generate a password-reset token e-mailed to the user. */
 function generateResetToken(length = 8) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const alphabetLength = alphabet.length;
+  // Calculate the largest multiple of alphabetLength that is less than or equal to 255.
+  // This is used for rejection sampling to ensure uniform distribution.
+  const maxValidValue = Math.floor(256 / alphabetLength) * alphabetLength;
+
   let out = "";
+  // Generate enough random bytes to cover the requested length,
+  // accounting for rejection sampling. A factor of 2 is a safe overestimate.
+  let randomBytesBuffer = crypto.randomBytes(length * 2);
+  let byteIndex = 0;
+
   for (let i = 0; i < length; i += 1) {
-    out += alphabet[Math.floor(Math.random() * alphabet.length)];
+    let value;
+    do {
+      // If we run out of bytes in the current buffer, generate more.
+      // This is unlikely for typical lengths with a buffer of length * 2.
+      if (byteIndex >= randomBytesBuffer.length) {
+        randomBytesBuffer = crypto.randomBytes(length * 2);
+        byteIndex = 0;
+      }
+      value = randomBytesBuffer.readUInt8(byteIndex++);
+    } while (value >= maxValidValue); // Rejection sampling to avoid bias
+
+    out += alphabet[value % alphabetLength];
   }
   return out;
 }
