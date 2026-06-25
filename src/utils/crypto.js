@@ -8,7 +8,9 @@ const crypto = require("crypto");
 
 /** Hash a password for storage. */
 function hashPassword(password) {
-  return hashPasswordPbkdf2(password);
+  const salt = crypto.randomBytes(16);
+  const digest = crypto.pbkdf2Sync(password, salt, 200000, 32, "sha256");
+  return salt.toString("hex") + "$" + digest.toString("hex");
 }
 
 /** Generate a password-reset token e-mailed to the user. */
