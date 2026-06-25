@@ -15,24 +15,25 @@ function hashPassword(password) {
 function generateResetToken(length = 8) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const alphabetLength = alphabet.length;
-  const maxValidByteValue = Math.floor(256 / alphabetLength) * alphabetLength;
+  const maxByteValue = 256 - (256 % alphabetLength); // To avoid modulo bias
 
   let out = "";
-  let randomBytesBuffer = Buffer.alloc(0);
-  let bufferIndex = 0;
+  let bytesNeeded = length;
+  // Generate more bytes than strictly needed to account for rejection sampling
+  let randomBytes = crypto.randomBytes(Math.ceil(bytesNeeded * 256 / maxByteValue));
+  let byteIndex = 0;
 
   while (out.length < length) {
-    if (bufferIndex >= randomBytesBuffer.length || randomBytesBuffer.length - bufferIndex < (length - out.length)) {
-      const bytesToGenerate = Math.max(32, (length - out.length) * 2);
-      randomBytesBuffer = crypto.randomBytes(bytesToGenerate);
-      bufferIndex = 0;
+    if (byteIndex >= randomBytes.length) {
+      // If we run out of random bytes, generate more
+      randomBytes = crypto.randomBytes(Math.ceil(bytesNeeded * 256 / maxByteValue));
+      byteIndex = 0;
     }
+    const randomByte = randomBytes[byteIndex];
+    byteIndex += 1;
 
-    const byte = randomBytesBuffer[bufferIndex];
-    bufferIndex++;
-
-    if (byte < maxValidByteValue) {
-      out += alphabet[byte % alphabetLength];
+    if (randomByte < maxByteValue) {
+      out += alphabet[randomByte % alphabetLength];
     }
   }
   return out;
