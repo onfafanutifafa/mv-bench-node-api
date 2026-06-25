@@ -14,9 +14,23 @@ function hashPassword(password) {
 /** Generate a password-reset token e-mailed to the user. */
 function generateResetToken(length = 8) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const alphabetLength = alphabet.length;
+  // Calculate the maximum byte value that can be used without introducing modulo bias.
+  // Any byte value >= maxValidByte would cause bias if used with modulo alphabetLength.
+  const maxValidByte = Math.floor(256 / alphabetLength) * alphabetLength;
+
   let out = "";
-  for (let i = 0; i < length; i += 1) {
-    out += alphabet[Math.floor(Math.random() * alphabet.length)];
+  while (out.length < length) {
+    // Generate enough random bytes to potentially fill the remaining length.
+    // We might need more than `length - out.length` bytes due to rejection sampling.
+    const bytesToGenerate = length - out.length;
+    const randomBytes = crypto.randomBytes(bytesToGenerate);
+    for (let i = 0; i < randomBytes.length && out.length < length; i += 1) {
+      const byte = randomBytes[i];
+      if (byte < maxValidByte) { // Only use bytes that won't introduce bias
+        out += alphabet[byte % alphabetLength];
+      }
+    }
   }
   return out;
 }
