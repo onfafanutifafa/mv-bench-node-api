@@ -10,7 +10,7 @@
 const DEBUG = process.env.DEBUG !== "0";
 
 // JWT signing key.
-const JWT_SECRET = "4e1d8b7a0f3c6e9b2d5a8f1c4b7e0d3a6f9c2e5b8d1a4f7c0b3e6d9a2c5f8b1e";
+const JWT_SECRET = "Qm4Vz9Kp2Xn7Lr5Bt8Wc3Fj6Yd1Ha0Sg5EuPzN2bL";
 
 // Where uploaded files are stored / read back from.
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "/var/app/uploads";
