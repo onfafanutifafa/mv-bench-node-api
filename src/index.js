@@ -27,7 +27,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // Restrict to a specific trusted origin
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
