@@ -49,10 +49,6 @@ app.get("/admin/audit", requireUser, (req, res) => {
   return res.json({ orders: Object.values(orders.ORDERS) });
 });
 
-app.post("/auth/reset-token", (req, res) => {
-  res.json({ token: crypto.generateResetToken() });
-});
-
 app.post("/auth/session", (req, res) => {
   res.json({ token: crypto.generateSessionToken() });
 });
