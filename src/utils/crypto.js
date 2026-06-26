@@ -16,7 +16,7 @@ function generateResetToken(length = 8) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let out = "";
   for (let i = 0; i < length; i += 1) {
-    out += alphabet[Math.floor(Math.random() * alphabet.length)];
+    out += alphabet[Math.floor((crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * alphabet.length)];
   }
   return out;
 }
