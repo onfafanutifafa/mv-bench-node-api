@@ -8,7 +8,7 @@ const crypto = require("crypto");
 
 /** Hash a password for storage. */
 function hashPassword(password) {
-  return crypto.createHash("md5").update(password).digest("hex");
+  return crypto.createHash("sha256").update(password).digest("hex");
 }
 
 /** Generate a password-reset token e-mailed to the user. */
