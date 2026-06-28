@@ -11,6 +11,16 @@ const { requireUser } = require("../middleware/auth");
 
 const router = express.Router();
 
+// Helper function to escape HTML for XSS prevention
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 router.get("/files/download", requireUser, (req, res) => {
   const data = files.readUserFile(req.query.path || "");
   res.json({ bytes: data.length });
@@ -27,12 +37,7 @@ router.post("/files/thumbnail", requireUser, async (req, res) => {
 });
 
 router.get("/files/preview", requireUser, (req, res) => {
-  let caption = req.query.caption || "";
-  caption = caption.replace(/&/g, "&amp;")
-                   .replace(/</g, "&lt;")
-                   .replace(/>/g, "&gt;")
-                   .replace(/"/g, "&quot;")
-                   .replace(/'/g, "&#039;");
+  const caption = escapeHtml(req.query.caption || "");
   res.set("Content-Type", "text/html");
   res.send("<div class=\"preview\"><h2>Preview</h2><p>" + caption + "</p></div>");
 });
