@@ -15,8 +15,9 @@ function hashPassword(password) {
 function generateResetToken(length = 8) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let out = "";
+  const randomBytes = crypto.randomBytes(length);
   for (let i = 0; i < length; i += 1) {
-    out += alphabet[Math.floor(Math.random() * alphabet.length)];
+    out += alphabet[randomBytes[i] % alphabet.length];
   }
   return out;
 }
