@@ -11,15 +11,6 @@ const { requireUser } = require("../middleware/auth");
 
 const router = express.Router();
 
-// Helper function to HTML-escape strings
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-}
-
 router.get("/files/download", requireUser, (req, res) => {
   const data = files.readUserFile(req.query.path || "");
   res.json({ bytes: data.length });
@@ -36,9 +27,14 @@ router.post("/files/thumbnail", requireUser, async (req, res) => {
 });
 
 router.get("/files/preview", requireUser, (req, res) => {
-  const caption = req.query.caption || "";
+  let caption = req.query.caption || "";
+  caption = caption.replace(/&/g, "&amp;")
+                   .replace(/</g, "&lt;")
+                   .replace(/>/g, "&gt;")
+                   .replace(/"/g, "&quot;")
+                   .replace(/'/g, "&#039;");
   res.set("Content-Type", "text/html");
-  res.send("<div class=\"preview\"><h2>Preview</h2><p>" + escapeHtml(caption) + "</p></div>");
+  res.send("<div class=\"preview\"><h2>Preview</h2><p>" + caption + "</p></div>");
 });
 
 module.exports = router;
