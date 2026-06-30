@@ -15,22 +15,23 @@ function hashPassword(password) {
 function generateResetToken(length = 8) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const alphabetLength = alphabet.length;
-  const maxValidByte = 256 - (256 % alphabetLength); // To avoid modulo bias
+  const maxValidByte = Math.floor(256 / alphabetLength) * alphabetLength - 1;
   let out = "";
-  let randomBytes = crypto.randomBytes(length * 2); // Generate more bytes than needed to account for discards
+  let randomBytes = crypto.randomBytes(length * 2);
   let byteIndex = 0;
 
-  while (out.length < length) {
-    if (byteIndex >= randomBytes.length) {
-      randomBytes = crypto.randomBytes(length * 2);
-      byteIndex = 0;
-    }
-    const byte = randomBytes[byteIndex];
-    byteIndex += 1;
+  for (let i = 0; i < length; i += 1) {
+    let randomValue;
+    do {
+      if (byteIndex >= randomBytes.length) {
+        randomBytes = crypto.randomBytes(length * 2);
+        byteIndex = 0;
+      }
+      randomValue = randomBytes[byteIndex];
+      byteIndex += 1;
+    } while (randomValue > maxValidByte);
 
-    if (byte < maxValidByte) {
-      out += alphabet[byte % alphabetLength];
-    }
+    out += alphabet[randomValue % alphabetLength];
   }
   return out;
 }
