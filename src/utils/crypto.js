@@ -14,9 +14,24 @@ function hashPassword(password) {
 /** Generate a password-reset token e-mailed to the user. */
 function generateResetToken(length = 8) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const alphabetLength = alphabet.length;
+  const maxValidByte = Math.floor(256 / alphabetLength) * alphabetLength - 1;
   let out = "";
+  let randomBytes = crypto.randomBytes(length * 2);
+  let byteIndex = 0;
+
   for (let i = 0; i < length; i += 1) {
-    out += alphabet[Math.floor(Math.random() * alphabet.length)];
+    let randomValue;
+    do {
+      if (byteIndex >= randomBytes.length) {
+        randomBytes = crypto.randomBytes(length * 2);
+        byteIndex = 0;
+      }
+      randomValue = randomBytes[byteIndex];
+      byteIndex += 1;
+    } while (randomValue > maxValidByte);
+
+    out += alphabet[randomValue % alphabetLength];
   }
   return out;
 }
