@@ -26,8 +26,17 @@ router.post("/files/thumbnail", requireUser, async (req, res) => {
   res.json({ exit_code: code });
 });
 
+// Helper function for HTML escaping
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+}
+
 router.get("/files/preview", requireUser, (req, res) => {
-  const caption = req.query.caption || "";
+  const caption = escapeHtml(req.query.caption || "");
   res.set("Content-Type", "text/html");
   res.send("<div class=\"preview\"><h2>Preview</h2><p>" + caption + "</p></div>");
 });
